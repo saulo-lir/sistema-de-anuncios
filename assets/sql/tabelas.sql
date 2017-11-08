@@ -29,3 +29,21 @@ create table anuncios(
     valor float,
     estado int    
 )
+
+
+-- TABELA anuncios_imagens --
+
+create table anuncios_imagens(
+    id int unsigned not null auto_increment primary key,
+    id_anuncio int,
+    url varchar(100)
+)
+
+
+
+
+
+
+
+
+
