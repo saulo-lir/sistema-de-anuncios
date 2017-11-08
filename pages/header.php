@@ -1,6 +1,5 @@
 <?php
     require './conexao.php';
-    require 'classes/usuarios.class.php';
 ?>
 
 <html>
@@ -21,9 +20,7 @@
                     <?php
                         if(isset($_SESSION['cLogin']) && !empty($_SESSION['cLogin'])){
                             
-                            $usuario = new Usuarios();
                     ?>
-                        <li><a href='#'>Bem vindo(a), <?= $usuario->userInfo($_SESSION['cLogin']); ?></a></li>
                         <li><a href='meus-anuncios.php'>Meus Anúncios</a></li>
                         <li><a href='sair.php'>Sair</a></li>
                     <?php

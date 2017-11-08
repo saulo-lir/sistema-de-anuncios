@@ -47,26 +47,7 @@
             }
             
         }
-        
-        public function userInfo($id){
-            global $pdo;
-            
-            $sql = "SELECT * FROM usuarios WHERE id = :id";
-            $sql = $pdo->prepare($sql);
-            $sql->bindValue(':id',$id);
-            $sql->execute();
-            
-            if($sql->rowCount() > 0){
-                $usuario = $sql->fetch();
-                
-            }
-            
-            return $usuario['nome'];
-        }
-        
-        
-
-
+     
                 
     }
 ?>
