@@ -39,10 +39,19 @@ if(empty($_SESSION['cLogin'])){
         ?>
         <tbody>
             <tr>
-                <td><img src='assets/images/anuncios/<?=$anuncio['url']?>' border='0' /></td>
+                <td>
+                    <?php if(!empty($anuncio['url'])){ ?>
+                        <img src='assets/images/anuncios/<?=$anuncio['url']?>' height='50' border='0' />
+                    <?php }else{ ?>
+                        <img src='assets/images/default.png' height='50' border='0' />
+                    <? } ?>    
+                </td>
                 <td><?= $anuncio['titulo']; ?></td>
                 <td>R$ <?= number_format($anuncio['valor'],2); ?></td>
-                <td></td>
+                <td>
+                    <a href='editar-anuncio.php?id=<?=$anuncio['id']?>' class='btn btn-primary'>Editar</a>
+                    <a href='excluir-anuncio.php?id=<?=$anuncio['id']?>' class='btn btn-danger'>Excluir</a>
+                </td>
             </tr>
         </tbody>    
         
