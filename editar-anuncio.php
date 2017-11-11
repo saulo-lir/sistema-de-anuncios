@@ -26,7 +26,13 @@ if(empty($_SESSION['cLogin'])){
         $descricao = addslashes($_POST['descricao']);
         $estado = addslashes($_POST['estado']);
         
-        $anuncio->editAnuncio($titulo, $categoria, $valor, $descricao, $estado, $_GET['id']);
+        if(isset($_FILES['fotos'])){
+            $fotos = $_FILES['fotos'];
+        }else {
+            $fotos = array();
+        }
+        
+        $anuncio->editAnuncio($titulo, $categoria, $valor, $descricao, $estado, $fotos, $_GET['id']);
 ?>
     <div class='alert alert-success'>
         Produto editado com sucesso!
@@ -94,6 +100,28 @@ if(empty($_SESSION['cLogin'])){
                 <option value='1' <?= ($dado['estado'] == 1)?'selected="selected"':''?>>Bom</option>
                 <option value='2' <?= ($dado['estado'] == 2)?'selected="selected"':''?>>Ótimo</option>
             </select>
+        </div>
+        
+        <div class='form-group'>
+            <label for='add_foto'>Fotos do Anúncio</label>
+            <input type='file' name='fotos[]' multiple id='add_foto' class='form-control' /><br/>
+            
+            <!-- Exibindo as fotos que já existem no anúncio -->
+            <div class='panel panel-default'>
+                <div class='panel-heading'>Fotos do Anúncio</div>
+                <div class='panel-body'>
+                    <?php
+                        foreach($dado['fotos'] as $foto){
+                    ?>
+                        <div class='foto-item'>
+                            <img src='assets/images/anuncios/<?=$foto['url']?>' class='img-thumbnail' border='0' /><br/>
+                            <a href='excluir-foto.php?id=<?=$foto['id']?>' class='btn btn-default'>Excluir imagem</a>
+                        </div>
+                    <?php        
+                        }
+                    ?>
+                </div>
+            </div>
         </div>
         
         <input type='submit' value='Salvar' class='btn btn-primary' />
