@@ -2,35 +2,99 @@
 
     class Anuncios{
         
-        public function getTotalAnuncios(){
+        public function getTotalAnuncios($filtros){
             global $pdo;
             
-            $sql = "SELECT COUNT(*) as c FROM anuncios";
-            $sql = $pdo->query($sql);
+             $filtroString = array('1=1'); // 1=1 evita que ocorra erro de sintaxe SQL após o WHERE,
+                                          // caso o array $filtroString não seja preenchido com os novos valores.
+                                          // Dessa forma, caso $filtroString não seja preenchido, a consulta irá ficar WHERE 1=1, não gerando erro
+            
+            if(!empty($filtros['categoria'])){
+                $filtroString[] = 'anuncios.id_categoria = :id_categoria';
+            }
+            
+            if(!empty($filtros['preco'])){
+                $filtroString[] = 'anuncios.valor BETWEEN :preco1 AND :preco2';
+            }
+            
+            if($filtros['estado'] !=''){
+                $filtroString[] = 'anuncios.estado = :estado';
+            }
+                
+            $sql = "SELECT COUNT(*) as c FROM anuncios WHERE ".implode(' AND ', $filtroString)." ";
+            $sql = $pdo->prepare($sql);
+            
+            
+            if(!empty($filtros['categoria'])){
+                $sql->bindValue(':id_categoria', $filtros['categoria']);
+            }
+            
+            if(!empty($filtros['preco'])){
+                $preco = explode('-', $filtros['preco']);
+                $sql->bindValue(':preco1', $preco[0]);
+                $sql->bindValue(':preco2', $preco[1]);
+            }
+            
+            if($filtros['estado'] !=''){
+                $sql->bindValue(':estado', $filtros['estado']);
+            }
+               
+            $sql->execute();
+               
             $row = $sql->fetch();
             
             return $row['c'];
             
         }
         
-        public function getUltimosAnuncios($pagina, $itemPorPagina){
+        public function getUltimosAnuncios($pagina, $itemPorPagina, $filtros){
             global $pdo;
             
             // Criando a paginação
             $offset = ($pagina - 1) * $itemPorPagina;
             
-            
-            
             $array = array();
+            
+            // Criando os filtros de pesquisa
+            $filtroString = array('1=1'); // 1=1 evita que ocorra erro de sintaxe SQL após o WHERE,
+                                          // caso o array $filtroString não seja preenchido com os novos valores.
+                                          // Dessa forma, caso $filtroString não seja preenchido, a consulta irá ficar WHERE 1=1, não gerando erro
+            
+            if(!empty($filtros['categoria'])){
+                $filtroString[] = 'anuncios.id_categoria = :id_categoria';
+            }
+            
+            if(!empty($filtros['preco'])){
+                $filtroString[] = 'anuncios.valor BETWEEN :preco1 AND :preco2';
+            }
+            
+            if($filtros['estado'] !=''){
+                $filtroString[] = 'anuncios.estado = :estado';
+            }
             
             $sql = "SELECT *, (select anuncios_imagens.url from anuncios_imagens
             where anuncios_imagens.id_anuncio = anuncios.id limit 1) as url,
             (select categorias.nome from categorias
             where categorias.id = anuncios.id_categoria) as categoria
-            FROM anuncios ORDER BY id DESC LIMIT $offset, 2";
-                        
-            $sql = $pdo->prepare($sql);
+            FROM anuncios WHERE ".implode(' AND ', $filtroString)." ORDER BY id DESC LIMIT $offset, 2";
             
+            $sql = $pdo->prepare($sql);
+              
+            if(!empty($filtros['categoria'])){
+                $sql->bindValue(':id_categoria', $filtros['categoria']);
+            }
+            
+            if(!empty($filtros['preco'])){
+                $preco = explode('-', $filtros['preco']);
+                $sql->bindValue(':preco1', $preco[0]);
+                $sql->bindValue(':preco2', $preco[1]);
+            }
+            
+            if($filtros['estado'] !=''){
+                $sql->bindValue(':estado', $filtros['estado']);
+            }  
+            
+   
             $sql->execute();
             
             if($sql->rowCount() > 0){
@@ -65,7 +129,10 @@
             $array= array();
             global $pdo;
             
-            $sql = "SELECT * FROM anuncios WHERE id = :id";
+            $sql = "SELECT *,
+            (select categorias.nome from categorias where categorias.id = anuncios.id_categoria) as categoria,
+            (select usuarios.telefone from usuarios where usuarios.id = anuncios.id_usuario) as telefone
+            FROM anuncios WHERE id = :id";
             $sql = $pdo->prepare($sql);
             $sql->bindValue(':id',$id);
             $sql->execute();
